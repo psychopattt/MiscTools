@@ -1,0 +1,10 @@
+﻿Id: MiscTools_dea0780b-3c2c-4aed-b387-8cb3a34e1562
+Name: Misc Tools
+Author: Psycho
+Version: 1.0
+Module: MiscTools.dll
+Type: GenericPlugin
+Icon: icon.png
+Links:
+    - Name: GitHub
+      Url: https://github.com/psychopattt/PlayniteMiscTools
