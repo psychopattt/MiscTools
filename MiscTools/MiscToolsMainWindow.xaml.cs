@@ -9,6 +9,7 @@ namespace MiscTools
 {
     public partial class MiscToolsMainWindow : PluginUserControl
     {
+        private readonly string[] generatedTags = new string[] { "Missing Media", "Large Media" };
         private static readonly ILogger logger = LogManager.GetLogger();
         private IPlayniteAPI PlayniteApi;
 
@@ -59,28 +60,37 @@ namespace MiscTools
             ShowDatabaseDirectory();
         }
 
-        // TODO maybe put some things in other functions (tag exist, create tag, ...)
-        private void btnMissingMedia_Click(object sender, System.Windows.RoutedEventArgs e)
+        // Find and return Guid
+        private Guid FindTagId(string tagName)
         {
-            bool tagExists = false;
             Guid tagGuid = new Guid();
 
             // Check if the tag already exists
             foreach (Tag tag in PlayniteApi.Database.Tags)
-            {
-                if (tag.Name == "Missing Media")
-                {
-                    tagExists = true;
+                if (tag.Name == tagName)
                     tagGuid = tag.Id;
-                }
-            }
 
-            if (!tagExists)
+            return tagGuid;
+        }
+
+        // Find or create tag and return Guid
+        private Guid GetTagId(string tagName)
+        {
+            Guid tagGuid = FindTagId(tagName);
+
+            if (tagGuid == new Guid()) // Tag does not exist
             {
-                Tag tag = new Tag("Missing Media");
+                Tag tag = new Tag(tagName);
                 PlayniteApi.Database.Tags.Add(tag);
                 tagGuid = tag.Id;
             }
+
+            return tagGuid;
+        }
+
+        private void btnMissingMedia_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Guid tagGuid = GetTagId("Missing Media");
 
             foreach (Game game in PlayniteApi.Database.Games)
             {
@@ -97,6 +107,17 @@ namespace MiscTools
                         PlayniteApi.Database.Games.Update(game);
                     }
                 }
+            }
+        }
+
+        private void btnCleanTags_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            foreach (string tagName in generatedTags)
+            {
+                Guid tagGuid = FindTagId(tagName);
+                
+                if (tagGuid != new Guid()) // Tag exists
+                    PlayniteApi.Database.Tags.Remove(tagGuid);
             }
         }
     }
