@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MiscTools
 {
@@ -88,6 +89,20 @@ namespace MiscTools
             return tagGuid;
         }
 
+        private void AddGameTag(Game game, Guid newTagGuid)
+        {
+            if (game.TagIds == null) // No tags
+            {
+                game.TagIds = new List<Guid> { newTagGuid };
+                PlayniteApi.Database.Games.Update(game);
+            }
+            else if (!game.TagIds.Contains(newTagGuid)) // No "Missing Media" tag
+            {
+                game.TagIds.Add(newTagGuid);
+                PlayniteApi.Database.Games.Update(game);
+            }
+        }
+
         private void btnMissingMedia_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Guid tagGuid = GetTagId("Missing Media");
@@ -96,17 +111,24 @@ namespace MiscTools
             {
                 if (string.IsNullOrWhiteSpace(game.Icon) || string.IsNullOrWhiteSpace(game.CoverImage) || string.IsNullOrWhiteSpace(game.BackgroundImage))
                 {
-                    if (game.TagIds == null) // No tags
-                    {
-                        game.TagIds = new List<Guid> { tagGuid };
-                        PlayniteApi.Database.Games.Update(game);
-                    }
-                    else if (!game.TagIds.Contains(tagGuid)) // No "Missing Media" tag
-                    {
-                        game.TagIds.Add(tagGuid);
-                        PlayniteApi.Database.Games.Update(game);
-                    }
+                    AddGameTag(game, tagGuid);
                 }
+            }
+        }
+
+        private void btnLargeMedia_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Guid tagGuid = GetTagId("Large Media");
+
+            foreach (Game game in PlayniteApi.Database.Games)
+            {
+                long maxSize = 1000; // kb
+
+                string gamePath = PlayniteApi.Database.DatabasePath + "\\files\\" + game.Id.ToString();
+                long size = Utilities.DirectorySize(new DirectoryInfo(gamePath)) / 1024;
+
+                if (size > maxSize)
+                    AddGameTag(game, tagGuid);
             }
         }
 

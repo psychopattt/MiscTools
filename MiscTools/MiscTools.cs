@@ -58,21 +58,6 @@ namespace MiscTools
             return new uint[] { missingIcons, missingCovers, missingBackgrounds };
         }
 
-        public long DirectorySize(DirectoryInfo dirInfo)
-        {
-            long size = 0;
-
-            // Add file sizes
-            foreach (FileInfo fileInfo in dirInfo.GetFiles())
-                size += fileInfo.Length;
-
-            // Add subdirectory sizes
-            foreach (DirectoryInfo directoryInfo in dirInfo.GetDirectories())
-                size += DirectorySize(directoryInfo);
-
-            return size;
-        }
-
         private string[] GetFolderSizes()
         {
             string databasePath = PlayniteApi.Database.DatabasePath;
@@ -81,8 +66,8 @@ namespace MiscTools
             DirectoryInfo cacheInfo = new DirectoryInfo(cachePath);
             DirectoryInfo databaseInfo = new DirectoryInfo(databasePath);
 
-            long cacheSize = DirectorySize(cacheInfo);
-            long databaseSize = DirectorySize(databaseInfo);
+            long cacheSize = Utilities.DirectorySize(cacheInfo);
+            long databaseSize = Utilities.DirectorySize(databaseInfo);
 
             string[] folderSizes = new string[2];
             folderSizes[0] = cacheSize < 1074000000 ? Math.Round((double)cacheSize / 1049000).ToString() + "Mb" : Math.Round((double)cacheSize / 1074000000, 2).ToString() + "Gb";
