@@ -6,9 +6,18 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <StackPanel>
-        <TextBlock Text="Description for Option1:"/>
-        <TextBox Text="{Binding Settings.Option1}"/>
-        <TextBlock Text="Description for Option2:"/>
-        <CheckBox IsChecked="{Binding Settings.Option2}"/>
+        <StackPanel Orientation="Horizontal">
+            <CheckBox x:Name="txtCleanNewGames" IsChecked="{Binding Settings.CleanNewGames}" Margin="20, 20, 0, 7" />
+            <TextBlock x:Name="lblCleanNewGames" Text="Automatically clean descriptions when new games are added" Margin="0, 22, 0, 7" />
+        </StackPanel>
+
+        <TextBlock x:Name="lblLargeMediaThreshold" Text='"Large Media" tag threshold:' Margin="20, 10, 0, 4" />
+        <StackPanel Orientation="Horizontal">
+            <TextBox x:Name="txtLargeMediaThreshold" Text="{Binding Settings.LargeMediaThreshold}" Width="120" HorizontalAlignment="Left" Margin="20, 4, 0, 0" 
+                 ToolTip="The maximum size a game's database entry can have before being marked as &quot;Large Media&quot; (kilobytes)"
+                 PreviewTextInput="txtLargeMediaThreshold_PreviewTextInput" DataObject.Pasting="txtLargeMediaThreshold_Pasting" 
+            />
+            <TextBlock x:Name="lblLargeMediaThresholdSize" Text='kb' Width="20" Margin="3, 10, 0, 4" />
+        </StackPanel>
     </StackPanel>
 </UserControl>

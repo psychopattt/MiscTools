@@ -91,11 +91,11 @@ namespace MiscTools
             window.Height = 300;
             window.Title = "Misc Tools";
             window.ResizeMode = ResizeMode.NoResize;
-
+            
             string[] data = new string[] { missingData[0].ToString(), missingData[1].ToString(), missingData[2].ToString(), folderSizes[0], folderSizes[1] };
 
             // Set window content
-            window.Content = new MiscToolsMainWindow(PlayniteApi, data);
+            window.Content = new MiscToolsMainWindow(PlayniteApi, settings.Settings, data);
 
             // Set owner if you need to create modal dialog window
             window.Owner = PlayniteApi.Dialogs.GetCurrentAppWindow();

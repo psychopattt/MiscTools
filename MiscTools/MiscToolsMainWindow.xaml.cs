@@ -12,6 +12,8 @@ namespace MiscTools
 {
     public partial class MiscToolsMainWindow : PluginUserControl
     {
+        private bool cleanNewGames;
+        private long largeMediaThreshold;
         private readonly string[] generatedTags = new string[] { "Missing Media", "Large Media" };
         private readonly Regex aboutGameRegex = new Regex(@"<h1>About the Game<\/h1>([\s\S]+)", RegexOptions.Compiled);
         private readonly Regex imgRegex = new Regex(@"(<[ap][^>]*>)?(<br>|<br\/>)?<img[^>]*>(<br>|<br\/>)?(<\/[ap]>)?", RegexOptions.Compiled);
@@ -19,11 +21,14 @@ namespace MiscTools
         private static readonly ILogger logger = LogManager.GetLogger();
         private IPlayniteAPI PlayniteApi;
 
-        public MiscToolsMainWindow(IPlayniteAPI playniteApi, string[] data)
+        public MiscToolsMainWindow(IPlayniteAPI playniteApi, MiscToolsSettings settings, string[] data)
         {
             InitializeComponent();
 
             PlayniteApi = playniteApi;
+
+            cleanNewGames = settings.CleanNewGames;
+            largeMediaThreshold = settings.LargeMediaThreshold;
 
             txtMissingIcons.Content = data[0];
             txtMissingCovers.Content = data[1];
@@ -31,6 +36,8 @@ namespace MiscTools
 
             txtCacheSize.Content = data[3];
             txtDatabaseSize.Content = data[4];
+
+            btnLargeMedia.ToolTip = string.Format("Adds a \"Large Media\" tag to every game whose directory is bigger than {0}kb", largeMediaThreshold);
         }
 
         private void ShowCacheDirectory()
@@ -190,12 +197,10 @@ namespace MiscTools
 
             foreach (Game game in PlayniteApi.Database.Games)
             {
-                long maxSize = 1000; // kb
-
                 string gamePath = PlayniteApi.Database.DatabasePath + "\\files\\" + game.Id.ToString();
                 long size = Utilities.DirectorySize(new DirectoryInfo(gamePath)) / 1024;
 
-                if (size > maxSize)
+                if (size > largeMediaThreshold)
                 {
                     if (AddGameTag(game, tagGuid))
                         updateCount++;
