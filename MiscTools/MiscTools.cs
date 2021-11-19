@@ -1,12 +1,15 @@
 ﻿using Playnite.SDK;
+using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MiscTools
 {
@@ -35,6 +38,16 @@ namespace MiscTools
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
             return new MiscToolsSettingsView();
+        }
+
+        public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
+        {
+            if (settings.Settings.CleanNewGames) // Clean game descriptions on library update
+            {
+                // Only clean descriptions for games added in the last 20 minutes
+                var recentlyAddedGames = PlayniteApi.Database.Games.Where(x => x.Added != null && x.Added > DateTime.Now.AddMinutes(-20));
+                Utilities.CleanDescriptions(PlayniteApi, recentlyAddedGames);
+            }
         }
 
         private uint[] GetMissingData()
@@ -100,6 +113,9 @@ namespace MiscTools
             // Set owner if you need to create modal dialog window
             window.Owner = PlayniteApi.Dialogs.GetCurrentAppWindow();
             window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+            // Close window when "esc" is pressed
+            window.PreviewKeyDown += (s, e) => { if (e.Key == Key.Escape) { window.Close(); } };
 
             // Use Show or ShowDialog to show the window
             window.ShowDialog();

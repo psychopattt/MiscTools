@@ -5,18 +5,14 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
-using System.Text;
+using System.Windows.Input;
 
 namespace MiscTools
 {
     public partial class MiscToolsMainWindow : PluginUserControl
     {
-        private bool cleanNewGames;
-        private long largeMediaThreshold;
+        MiscToolsSettings settings;
         private readonly string[] generatedTags = new string[] { "Missing Media", "Large Media" };
-        private readonly Regex aboutGameRegex = new Regex(@"<h1>About the Game<\/h1>([\s\S]+)", RegexOptions.Compiled);
-        private readonly Regex imgRegex = new Regex(@"(<[ap][^>]*>)?(<br>|<br\/>)?<img[^>]*>(<br>|<br\/>)?(<\/[ap]>)?", RegexOptions.Compiled);
 
         private static readonly ILogger logger = LogManager.GetLogger();
         private IPlayniteAPI PlayniteApi;
@@ -26,9 +22,7 @@ namespace MiscTools
             InitializeComponent();
 
             PlayniteApi = playniteApi;
-
-            cleanNewGames = settings.CleanNewGames;
-            largeMediaThreshold = settings.LargeMediaThreshold;
+            this.settings = settings;
 
             txtMissingIcons.Content = data[0];
             txtMissingCovers.Content = data[1];
@@ -37,7 +31,7 @@ namespace MiscTools
             txtCacheSize.Content = data[3];
             txtDatabaseSize.Content = data[4];
 
-            btnLargeMedia.ToolTip = string.Format("Adds a \"Large Media\" tag to every game whose directory is bigger than {0}kb", largeMediaThreshold);
+            btnLargeMedia.ToolTip = string.Format("Adds a \"Large Media\" tag to every game whose directory is bigger than {0}kb", settings.LargeMediaThreshold);
         }
 
         private void ShowCacheDirectory()
@@ -53,22 +47,22 @@ namespace MiscTools
             Process.Start(databasePath);
         }
 
-        private void lblCacheSize_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void lblCacheSize_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ShowCacheDirectory();
         }
 
-        private void txtCacheSize_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void txtCacheSize_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ShowCacheDirectory();
         }
 
-        private void lblDatabaseSize_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void lblDatabaseSize_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ShowDatabaseDirectory();
         }
 
-        private void txtDatabaseSize_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void txtDatabaseSize_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ShowDatabaseDirectory();
         }
@@ -141,52 +135,7 @@ namespace MiscTools
 
         private void btnCleanDesc_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            uint updateCount = 0;
-
-            foreach (Game game in PlayniteApi.Database.Games)
-            {
-                if (!string.IsNullOrWhiteSpace(game.Description))
-                {
-                    bool updated = false;
-                    string description = game.Description;
-
-                    Match aboutGameMatch = aboutGameRegex.Match(description);
-
-                    if (aboutGameMatch.Success)
-                    {
-                        description = aboutGameMatch.Groups[1].Value;
-                        updated = true;
-                    }
-
-                    Match imgMatch = imgRegex.Match(description);
-
-                    if (imgMatch.Success)
-                    {
-                        int startIndex = 0;
-                        StringBuilder descBuilder = new StringBuilder();
-
-                        while (imgMatch.Success)
-                        {
-                            int length = imgMatch.Index - startIndex;
-                            descBuilder.Append(description.Substring(startIndex, length)); // Add everything between the last match and the current match
-                            startIndex += length + imgMatch.Value.Length;
-                            imgMatch = imgMatch.NextMatch();
-                        }
-
-                        descBuilder.Append(description.Substring(startIndex)); // Add everything after the last match
-                        description = descBuilder.ToString();
-                        updated = true;
-                    }
-
-                    if (updated)
-                    {
-                        game.Description = description;
-                        PlayniteApi.Database.Games.Update(game);
-                        updateCount++;
-                    }
-                }
-            }
-
+            uint updateCount = Utilities.CleanDescriptions(PlayniteApi, PlayniteApi.Database.Games);
             PlayniteApi.Dialogs.ShowMessage(string.Format("{0} game description{1} been updated.", updateCount, updateCount != 1 ? "s have" : " has"), "Description Cleanup");
         }
 
@@ -200,7 +149,7 @@ namespace MiscTools
                 string gamePath = PlayniteApi.Database.DatabasePath + "\\files\\" + game.Id.ToString();
                 long size = Utilities.DirectorySize(new DirectoryInfo(gamePath)) / 1024;
 
-                if (size > largeMediaThreshold)
+                if (size > settings.LargeMediaThreshold)
                 {
                     if (AddGameTag(game, tagGuid))
                         updateCount++;
