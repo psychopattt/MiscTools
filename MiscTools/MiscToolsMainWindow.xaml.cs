@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Input;
+using System.Linq;
 
 namespace MiscTools
 {
@@ -119,16 +120,29 @@ namespace MiscTools
         private void btnMissingMedia_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             uint updateCount = 0;
-            Guid tagGuid = GetTagId("Missing Media");
+            GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Adding \"Missing Media\" tags", true);
+            progressOptions.IsIndeterminate = false;
 
-            foreach (Game game in PlayniteApi.Database.Games)
+            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
             {
-                if (string.IsNullOrWhiteSpace(game.Icon) || string.IsNullOrWhiteSpace(game.CoverImage) || string.IsNullOrWhiteSpace(game.BackgroundImage))
+                Guid tagGuid = GetTagId("Missing Media");
+                progressBar.ProgressMaxValue = PlayniteApi.Database.Games.Count();
+
+                foreach (Game game in PlayniteApi.Database.Games)
                 {
-                    if (AddGameTag(game, tagGuid))
-                        updateCount++;
+                    if (string.IsNullOrWhiteSpace(game.Icon) || string.IsNullOrWhiteSpace(game.CoverImage) || string.IsNullOrWhiteSpace(game.BackgroundImage))
+                    {
+                        if (AddGameTag(game, tagGuid))
+                            updateCount++;
+                    }
+
+                    progressBar.CurrentProgressValue++;
+
+                    if (progressBar.CancelToken.IsCancellationRequested)
+                        break; // Stop adding tags
                 }
-            }
+
+            }, progressOptions);
 
             PlayniteApi.Dialogs.ShowMessage(string.Format("{0} game{1} been updated.", updateCount, updateCount != 1 ? "s have" : " has"), "Missing Media Tags");
         }
@@ -142,19 +156,32 @@ namespace MiscTools
         private void btnLargeMedia_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             uint updateCount = 0;
-            Guid tagGuid = GetTagId("Large Media");
+            GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Adding \"Large Media\" tags", true);
+            progressOptions.IsIndeterminate = false;
 
-            foreach (Game game in PlayniteApi.Database.Games)
+            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
             {
-                string gamePath = PlayniteApi.Database.DatabasePath + "\\files\\" + game.Id.ToString();
-                long size = Utilities.DirectorySize(new DirectoryInfo(gamePath)) / 1024;
+                Guid tagGuid = GetTagId("Large Media");
+                string gamesPath = PlayniteApi.Database.DatabasePath + "\\files\\";
+                progressBar.ProgressMaxValue = PlayniteApi.Database.Games.Count();
 
-                if (size > settings.LargeMediaThreshold)
+                foreach (Game game in PlayniteApi.Database.Games)
                 {
-                    if (AddGameTag(game, tagGuid))
-                        updateCount++;
+                    long size = Utilities.DirectorySize(new DirectoryInfo(gamesPath + game.Id.ToString())) / 1024;
+
+                    if (size > settings.LargeMediaThreshold)
+                    {
+                        if (AddGameTag(game, tagGuid))
+                            updateCount++;
+                    }
+
+                    progressBar.CurrentProgressValue++;
+
+                    if (progressBar.CancelToken.IsCancellationRequested)
+                        break; // Stop adding tags
                 }
-            }
+
+            }, progressOptions);
 
             PlayniteApi.Dialogs.ShowMessage(string.Format("{0} game{1} been updated.", updateCount, updateCount != 1 ? "s have" : " has"), "Large Media Tags");
         }
@@ -162,17 +189,30 @@ namespace MiscTools
         private void btnCleanTags_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             byte updateCount = 0;
+            GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Removing generated tags", true);
+            progressOptions.IsIndeterminate = false;
 
-            foreach (string tagName in generatedTags)
+            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
             {
-                Guid tagGuid = FindTagId(tagName);
-                
-                if (tagGuid != new Guid()) // Tag exists
+                progressBar.ProgressMaxValue = generatedTags.Length;
+
+                foreach (string tagName in generatedTags)
                 {
-                    PlayniteApi.Database.Tags.Remove(tagGuid);
-                    updateCount++;
+                    Guid tagGuid = FindTagId(tagName);
+                
+                    if (tagGuid != new Guid()) // Tag exists
+                    {
+                        PlayniteApi.Database.Tags.Remove(tagGuid);
+                        updateCount++;
+                    }
+
+                    progressBar.CurrentProgressValue++;
+
+                    if (progressBar.CancelToken.IsCancellationRequested)
+                        break; // Stop removing tags
                 }
-            }
+
+            }, progressOptions);
 
             PlayniteApi.Dialogs.ShowMessage(string.Format("{0} tag{1} been deleted.", updateCount, updateCount != 1 ? "s have" : " has"), "Tag Cleaner");
         }

@@ -91,9 +91,6 @@ namespace MiscTools
 
         private void ShowWindow()
         {
-            uint[] missingData = GetMissingData();
-            string[] folderSizes = GetFolderSizes();
-
             Window window = PlayniteApi.Dialogs.CreateWindow(new WindowCreationOptions
             {
                 ShowMinimizeButton = false,
@@ -105,7 +102,16 @@ namespace MiscTools
             window.Title = "Misc Tools";
             window.ResizeMode = ResizeMode.NoResize;
             
-            string[] data = new string[] { missingData[0].ToString(), missingData[1].ToString(), missingData[2].ToString(), folderSizes[0], folderSizes[1] };
+            string[] data = new string[0];
+            GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Gathering data", false);
+            progressOptions.IsIndeterminate = true;
+
+            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
+            {
+                uint[] missingData = GetMissingData();
+                string[] folderSizes = GetFolderSizes();
+                data = new string[] { missingData[0].ToString(), missingData[1].ToString(), missingData[2].ToString(), folderSizes[0], folderSizes[1] };
+            }, progressOptions);
 
             // Set window content
             window.Content = new MiscToolsMainWindow(PlayniteApi, settings.Settings, data);

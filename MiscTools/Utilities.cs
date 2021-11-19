@@ -56,35 +56,35 @@ namespace MiscTools
         private static uint CleanDescriptionsProgress(IPlayniteAPI playniteApi, IEnumerable<Game> games)
         {
             uint updateCount = 0;
+            GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Cleaning Descriptions", true);
+            progressOptions.IsIndeterminate = false;
 
-            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions("Misc Tools - Cleaning Descriptions", true);
-            globalProgressOptions.IsIndeterminate = false;
-
-            playniteApi.Dialogs.ActivateGlobalProgress((globalProgress) =>
+            playniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
             {
-                globalProgress.ProgressMaxValue = games.Count();
+                progressBar.ProgressMaxValue = games.Count();
 
                 foreach (Game game in games)
                 {
                     if (CleanDescription(playniteApi, game))
                         updateCount++;
 
-                    globalProgress.CurrentProgressValue++;
+                    progressBar.CurrentProgressValue++;
 
-                    if (globalProgress.CancelToken.IsCancellationRequested)
+                    if (progressBar.CancelToken.IsCancellationRequested)
                         break; // Stop cleaning games
                 }
 
-            }, globalProgressOptions);
+            }, progressOptions);
 
             return updateCount;
         }
 
         private static bool CleanDescription(IPlayniteAPI playniteApi, Game game)
         {
+            bool updated = false;
+
             if (!string.IsNullOrWhiteSpace(game.Description))
             {
-                bool updated = false;
                 string description = game.Description;
 
                 Match aboutGameMatch = aboutGameRegex.Match(description);
@@ -119,11 +119,10 @@ namespace MiscTools
                 {
                     game.Description = description;
                     playniteApi.Database.Games.Update(game);
-                    return true;
                 }
             }
 
-            return false;
+            return updated;
         }
     }
 }
