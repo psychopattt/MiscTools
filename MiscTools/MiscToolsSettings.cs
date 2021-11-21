@@ -8,9 +8,11 @@ namespace MiscTools
     {
         private long largeMediaThreshold = 1024;
         private bool cleanNewGames = false;
+        private bool clearCache = false;
 
         public long LargeMediaThreshold { get => largeMediaThreshold; set => SetValue(ref largeMediaThreshold, value); }
         public bool CleanNewGames { get => cleanNewGames; set => SetValue(ref cleanNewGames, value); }
+        public bool ClearCache { get => clearCache; set => SetValue(ref clearCache, value); }
     }
 
     public class MiscToolsSettingsViewModel : ObservableObject, ISettings

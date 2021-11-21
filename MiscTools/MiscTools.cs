@@ -50,6 +50,16 @@ namespace MiscTools
             }
         }
 
+        public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
+        {
+            if (settings.Settings.ClearCache)
+            {
+                string databasePath = PlayniteApi.Database.DatabasePath;
+                string cachePath = databasePath.Remove(databasePath.LastIndexOf('\\') + 1) + "cache";
+                Directory.Delete(cachePath, true);
+            }
+        }
+
         private uint[] GetMissingData()
         {
             uint missingIcons = 0;

@@ -7,8 +7,15 @@
              d:DesignHeight="400" d:DesignWidth="600">
     <StackPanel>
         <StackPanel Orientation="Horizontal">
-            <CheckBox x:Name="txtCleanNewGames" IsChecked="{Binding Settings.CleanNewGames}" Margin="20, 20, 0, 7" />
-            <TextBlock x:Name="lblCleanNewGames" Text="Automatically clean descriptions when new games are added" Margin="0, 22, 0, 7" />
+            <CheckBox x:Name="chkCleanNewGames" IsChecked="{Binding Settings.CleanNewGames}" Margin="20, 20, 0, 7">
+                <TextBlock x:Name="lblCleanNewGames" Text="Automatically clean descriptions when new games are added" />
+            </CheckBox>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <CheckBox x:Name="chkClearCache" IsChecked="{Binding Settings.ClearCache}" Margin="20, 15, 0, 10">
+                <TextBlock x:Name="lblClearCache" Text="Automatically clear the cache when Playnite is closed" />
+            </CheckBox>
         </StackPanel>
 
         <TextBlock x:Name="lblLargeMediaThreshold" Text='"Large Media" tag threshold:' Margin="20, 10, 0, 4" />
