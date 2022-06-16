@@ -9,10 +9,12 @@ namespace MiscTools
         private long largeMediaThreshold = 1024;
         private bool cleanNewGames = false;
         private bool clearCache = false;
+        private string missingMediaExclusions = "";
 
         public long LargeMediaThreshold { get => largeMediaThreshold; set => SetValue(ref largeMediaThreshold, value); }
         public bool CleanNewGames { get => cleanNewGames; set => SetValue(ref cleanNewGames, value); }
         public bool ClearCache { get => clearCache; set => SetValue(ref clearCache, value); }
+        public string MissingMediaExclusions { get => missingMediaExclusions; set => SetValue(ref missingMediaExclusions, value); }
     }
 
     public class MiscToolsSettingsViewModel : ObservableObject, ISettings
@@ -38,7 +40,7 @@ namespace MiscTools
 
             MiscToolsSettings savedSettings = plugin.LoadPluginSettings<MiscToolsSettings>();
 
-            // LoadPluginSettings returns null if not saved data is available.
+            // LoadPluginSettings returns null if no saved data is available.
             if (savedSettings != null)
                 Settings = savedSettings;
             else

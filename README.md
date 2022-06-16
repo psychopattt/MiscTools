@@ -8,6 +8,7 @@ A plugin for [Playnite](https://playnite.link/) that adds a few tools to manage 
 - Shows database size
 - Shows cache size
 - Button to add a "Missing Media" tag to every game that's missing any type of image
+  - Setting to prevent games in certain categories from being marked
 - Button to add a "Large Media" tag to game database entries bigger than the specified size
    - The size can be modified in the settings
 - Button to cleanup game descriptions

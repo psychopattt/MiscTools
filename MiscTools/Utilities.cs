@@ -32,6 +32,21 @@ namespace MiscTools
             return size;
         }
 
+        public static string[] GetMissingMediaExcludedCategories(MiscToolsSettings settings)
+        {
+            return settings.MissingMediaExclusions
+                .Split('\n')
+                .Select(x => x.Trim().ToLower())
+                .Where(x => x != "")
+                .ToArray();
+        }
+
+        public static bool GetGameExcludedFromMissingMedia(Game game, string[] excludedCategories)
+        {
+            return game.Categories != null &&
+                game.Categories.Exists(category => excludedCategories.Contains(category.Name.Trim().ToLower()));
+        }
+
         public static uint CleanDescriptions(IPlayniteAPI playniteApi, IEnumerable<Game> games)
         {
             if (games.Count() < progressBarThreshold) // Don't show progress bar if there's less than X games to update
@@ -59,7 +74,7 @@ namespace MiscTools
             GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Cleaning Descriptions", true);
             progressOptions.IsIndeterminate = false;
 
-            playniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
+            playniteApi.Dialogs.ActivateGlobalProgress(progressBar =>
             {
                 progressBar.ProgressMaxValue = games.Count();
 

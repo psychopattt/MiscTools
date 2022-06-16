@@ -26,5 +26,12 @@
             />
             <TextBlock x:Name="lblLargeMediaThresholdSize" Text='kb' Width="20" Margin="3, 10, 0, 4" />
         </StackPanel>
+        
+        <TextBlock x:Name="lblMissingMediaExclusions" Text='Categories not checked for missing media:' Margin="20, 20, 0, 4" />
+        <StackPanel Orientation="Horizontal">
+            <TextBox x:Name="txtMissingMediaExclusions" Text="{Binding Settings.MissingMediaExclusions}" Width="560" Height="200" Margin="20, 4, 0, 0" 
+                 ToolTip="Categories not verified when adding the &quot;Missing Media&quot; tag" AcceptsReturn="True" TextWrapping="Wrap"
+            />
+        </StackPanel>
     </StackPanel>
 </UserControl>

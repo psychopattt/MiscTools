@@ -65,17 +65,21 @@ namespace MiscTools
             uint missingIcons = 0;
             uint missingCovers = 0;
             uint missingBackgrounds = 0;
+            string[] excludedCategories = Utilities.GetMissingMediaExcludedCategories(settings.Settings);
 
             foreach (Game game in PlayniteApi.Database.Games)
             {
-                if (string.IsNullOrWhiteSpace(game.Icon))
-                    missingIcons++;
+                if (!Utilities.GetGameExcludedFromMissingMedia(game, excludedCategories))
+                {
+                    if (string.IsNullOrWhiteSpace(game.Icon))
+                        missingIcons++;
 
-                if (string.IsNullOrWhiteSpace(game.CoverImage))
-                    missingCovers++;
+                    if (string.IsNullOrWhiteSpace(game.CoverImage))
+                        missingCovers++;
 
-                if (string.IsNullOrWhiteSpace(game.BackgroundImage))
-                    missingBackgrounds++;
+                    if (string.IsNullOrWhiteSpace(game.BackgroundImage))
+                        missingBackgrounds++;
+                }
             }
 
             return new uint[] { missingIcons, missingCovers, missingBackgrounds };
@@ -111,12 +115,12 @@ namespace MiscTools
             window.Height = 300;
             window.Title = "Misc Tools";
             window.ResizeMode = ResizeMode.NoResize;
-            
+
             string[] data = new string[0];
             GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Gathering data", false);
             progressOptions.IsIndeterminate = true;
 
-            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
+            PlayniteApi.Dialogs.ActivateGlobalProgress(progressBar =>
             {
                 uint[] missingData = GetMissingData();
                 string[] folderSizes = GetFolderSizes();

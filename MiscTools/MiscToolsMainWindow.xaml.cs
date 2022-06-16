@@ -123,17 +123,21 @@ namespace MiscTools
             GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Adding \"Missing Media\" tags", true);
             progressOptions.IsIndeterminate = false;
 
-            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
+            PlayniteApi.Dialogs.ActivateGlobalProgress(progressBar =>
             {
                 Guid tagGuid = GetTagId("Missing Media");
                 progressBar.ProgressMaxValue = PlayniteApi.Database.Games.Count();
+                string[] excludedCategories = Utilities.GetMissingMediaExcludedCategories(settings);
 
                 foreach (Game game in PlayniteApi.Database.Games)
                 {
                     if (string.IsNullOrWhiteSpace(game.Icon) || string.IsNullOrWhiteSpace(game.CoverImage) || string.IsNullOrWhiteSpace(game.BackgroundImage))
                     {
-                        if (AddGameTag(game, tagGuid))
-                            updateCount++;
+                        if (!Utilities.GetGameExcludedFromMissingMedia(game, excludedCategories))
+                        {
+                            if (AddGameTag(game, tagGuid))
+                                updateCount++;
+                        }
                     }
 
                     progressBar.CurrentProgressValue++;
@@ -159,7 +163,7 @@ namespace MiscTools
             GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Adding \"Large Media\" tags", true);
             progressOptions.IsIndeterminate = false;
 
-            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
+            PlayniteApi.Dialogs.ActivateGlobalProgress(progressBar =>
             {
                 Guid tagGuid = GetTagId("Large Media");
                 string gamesPath = PlayniteApi.Database.DatabasePath + "\\files\\";
@@ -192,7 +196,7 @@ namespace MiscTools
             GlobalProgressOptions progressOptions = new GlobalProgressOptions("Misc Tools - Removing generated tags", true);
             progressOptions.IsIndeterminate = false;
 
-            PlayniteApi.Dialogs.ActivateGlobalProgress((progressBar) =>
+            PlayniteApi.Dialogs.ActivateGlobalProgress(progressBar =>
             {
                 progressBar.ProgressMaxValue = generatedTags.Length;
 
