@@ -24,7 +24,7 @@
                  ToolTip="The maximum size a game's database entry can have before being marked as &quot;Large Media&quot; (kilobytes)"
                  PreviewTextInput="txtLargeMediaThreshold_PreviewTextInput" DataObject.Pasting="txtLargeMediaThreshold_Pasting" 
             />
-            <TextBlock x:Name="lblLargeMediaThresholdSize" Text='kb' Width="20" Margin="3, 10, 0, 4" />
+            <TextBlock x:Name="lblLargeMediaThresholdSize" Text='KB' Width="20" Margin="3, 10, 0, 4" />
         </StackPanel>
         
         <TextBlock x:Name="lblMissingMediaExclusions" Text='Categories not checked for missing media:' Margin="20, 20, 0, 4" />

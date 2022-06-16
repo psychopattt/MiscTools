@@ -45,7 +45,9 @@ namespace MiscTools
             if (settings.Settings.CleanNewGames) // Clean game descriptions on library update
             {
                 // Only clean descriptions for games added in the last 20 minutes
-                var recentlyAddedGames = PlayniteApi.Database.Games.Where(x => x.Added != null && x.Added > DateTime.Now.AddMinutes(-20));
+                IEnumerable<Game> recentlyAddedGames = PlayniteApi.Database.Games
+                    .Where(x => x.Added != null && x.Added > DateTime.Now.AddMinutes(-20));
+
                 Utilities.CleanDescriptions(PlayniteApi, recentlyAddedGames);
             }
         }
@@ -97,8 +99,8 @@ namespace MiscTools
             long databaseSize = Utilities.DirectorySize(databaseInfo);
 
             string[] folderSizes = new string[2];
-            folderSizes[0] = cacheSize < 1074000000 ? Math.Round((double)cacheSize / 1049000).ToString() + "Mb" : Math.Round((double)cacheSize / 1074000000, 2).ToString() + "Gb";
-            folderSizes[1] = databaseSize < 1074000000 ? Math.Round((double)databaseSize / 1049000).ToString() + "Mb" : Math.Round((double)databaseSize / 1074000000, 2).ToString() + "Gb";
+            folderSizes[0] = cacheSize < 1074000000 ? Math.Round((double)cacheSize / 1049000).ToString() + "MB" : Math.Round((double)cacheSize / 1074000000, 2).ToString() + "GB";
+            folderSizes[1] = databaseSize < 1074000000 ? Math.Round((double)databaseSize / 1049000).ToString() + "MB" : Math.Round((double)databaseSize / 1074000000, 2).ToString() + "GB";
 
             return folderSizes;
         }

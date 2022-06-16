@@ -41,10 +41,7 @@ namespace MiscTools
             MiscToolsSettings savedSettings = plugin.LoadPluginSettings<MiscToolsSettings>();
 
             // LoadPluginSettings returns null if no saved data is available.
-            if (savedSettings != null)
-                Settings = savedSettings;
-            else
-                Settings = new MiscToolsSettings();
+            Settings = savedSettings ?? new MiscToolsSettings();
         }
 
         public void BeginEdit()

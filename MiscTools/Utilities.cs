@@ -23,11 +23,15 @@ namespace MiscTools
 
             // Add file sizes
             foreach (FileInfo fileInfo in dirInfo.GetFiles())
+            {
                 size += fileInfo.Length;
+            }
 
             // Add subdirectory sizes
             foreach (DirectoryInfo directoryInfo in dirInfo.GetDirectories())
+            {
                 size += DirectorySize(directoryInfo);
+            }
 
             return size;
         }
@@ -49,10 +53,9 @@ namespace MiscTools
 
         public static uint CleanDescriptions(IPlayniteAPI playniteApi, IEnumerable<Game> games)
         {
-            if (games.Count() < progressBarThreshold) // Don't show progress bar if there's less than X games to update
-                return CleanDescriptionsSilent(playniteApi, games);
-            else
-                return CleanDescriptionsProgress(playniteApi, games);
+            return games.Count() < progressBarThreshold
+                ? CleanDescriptionsSilent(playniteApi, games)
+                : CleanDescriptionsProgress(playniteApi, games);
         }
 
         private static uint CleanDescriptionsSilent(IPlayniteAPI playniteApi, IEnumerable<Game> games)
@@ -88,7 +91,6 @@ namespace MiscTools
                     if (progressBar.CancelToken.IsCancellationRequested)
                         break; // Stop cleaning games
                 }
-
             }, progressOptions);
 
             return updateCount;

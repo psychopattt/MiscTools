@@ -32,7 +32,7 @@ namespace MiscTools
             txtCacheSize.Content = data[3];
             txtDatabaseSize.Content = data[4];
 
-            btnLargeMedia.ToolTip = string.Format("Adds a \"Large Media\" tag to every game whose directory is bigger than {0}kb", settings.LargeMediaThreshold);
+            btnLargeMedia.ToolTip = string.Format("Adds a \"Large Media\" tag to every game whose directory is bigger than {0}KB", settings.LargeMediaThreshold);
         }
 
         private void ShowCacheDirectory()
