@@ -21,8 +21,7 @@ namespace MiscTools
     {
         private readonly MiscTools plugin;
         private MiscToolsSettings settings;
-
-        private MiscToolsSettings editingClone { get; set; }
+        private MiscToolsSettings editingClone;
 
         public MiscToolsSettings Settings
         {
@@ -61,7 +60,6 @@ namespace MiscTools
 
         public bool VerifySettings(out List<string> errors)
         {
-            // No errors possible AFAIK
             errors = new List<string>();
             return true;
         }

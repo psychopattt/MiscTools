@@ -15,9 +15,8 @@ namespace MiscTools
 {
     public class MiscTools : GenericPlugin
     {
+        private readonly MiscToolsSettingsViewModel settings;
         private static readonly ILogger logger = LogManager.GetLogger();
-
-        private MiscToolsSettingsViewModel settings { get; set; }
 
         public override Guid Id { get; } = Guid.Parse("dea0780b-3c2c-4aed-b387-8cb3a34e1562");
 
@@ -149,7 +148,7 @@ namespace MiscTools
             {
                 new SidebarItem
                 {
-                    Title = "Tools",            
+                    Title = "Tools",
                     // Loads icon from plugin's installation path
                     Icon = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "icon.png"),
                     ProgressValue = 0,
